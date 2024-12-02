@@ -22,7 +22,7 @@ export default function Dashboard() {
 
   return (
     <GlobalStateProvider>
-      <div className="container mx-auto p-4 select-none flex flex-col">
+      <div className="container mx-auto p-0.5 md:p-4 select-none flex flex-col">
         <h1 className="text-2xl font-bold mb-4">Painel de Análise de Dados</h1>
         <Tabs defaultValue="grouping flex flex-col">
           <TabsList className="flex h-full flex-row flex-wrap ">

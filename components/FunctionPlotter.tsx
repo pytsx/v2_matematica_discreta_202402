@@ -74,7 +74,7 @@ export default function EnhancedFunctionPlotter() {
       width: 500,
       height: 300,
       data: data,
-      margin: { top: 5, right: 30, left: 20, bottom: 5 },
+      margin: { top: 5, right: 10, left: 0, bottom: 5 },
     }
 
     switch (chartType) {
