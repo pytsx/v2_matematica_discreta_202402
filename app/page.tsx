@@ -22,16 +22,16 @@ export default function Dashboard() {
 
   return (
     <GlobalStateProvider>
-      <div className="container mx-auto p-4 select-none">
+      <div className="container mx-auto p-4 select-none flex flex-col">
         <h1 className="text-2xl font-bold mb-4">Painel de Análise de Dados</h1>
-        <Tabs defaultValue="grouping">
-          <TabsList>
-            <TabsTrigger value="grouping">Agrupamento de Intervalos</TabsTrigger>
-            <TabsTrigger value="function">Plotador de Funções</TabsTrigger>
-            <TabsTrigger value="tree">Árvore Dinâmica</TabsTrigger>
-            <TabsTrigger value="graphs">Exibição de Multi-Gráficos</TabsTrigger>
-            <TabsTrigger value="algorithm">Fluxograma do Algoritmo</TabsTrigger>
-            <TabsTrigger value="state">Gerenciamento de Estado</TabsTrigger>
+        <Tabs defaultValue="grouping flex flex-col">
+          <TabsList className="flex h-full flex-row flex-wrap ">
+            <TabsTrigger value="grouping" className=" flex-1 ">Agrupamento de Intervalos</TabsTrigger>
+            <TabsTrigger value="function" className=" flex-1">Plotador de Funções</TabsTrigger>
+            <TabsTrigger value="tree" className=" flex-1">Árvore Dinâmica</TabsTrigger>
+            <TabsTrigger value="graphs" className=" flex-1">Exibição de Multi-Gráficos</TabsTrigger>
+            <TabsTrigger value="algorithm" className=" flex-1">Fluxograma do Algoritmo</TabsTrigger>
+            <TabsTrigger value="state" className=" flex-1">Gerenciamento de Estado</TabsTrigger>
           </TabsList>
           <TabsContent value="grouping">
             <Card>
