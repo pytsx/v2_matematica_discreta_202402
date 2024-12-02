@@ -7,13 +7,13 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useGlobalState } from '@/app/state/globalState'
 
 type ChartType = 'bar' | 'line' | 'area'
 
 export default function IntervalGroupingMultiVisualization() {
-  const [data, setData] = useState('')
-  const [interval, setInterval] = useState('')
-  const [result, setResult] = useState<{ [key: string]: number[] }>({})
+  const { state, dispatch } = useGlobalState()
+  const { data, interval, result } = state.intervalGrouping
   const [chartType, setChartType] = useState<ChartType>('bar')
 
   const handleGrouping = () => {
@@ -29,7 +29,7 @@ export default function IntervalGroupingMultiVisualization() {
       grouped[groupKey].push(num)
     })
 
-    setResult(grouped)
+    dispatch({ type: 'SET_INTERVAL_GROUPING', payload: { result: grouped } })
   }
 
   const chartData = useMemo(() => {
@@ -102,7 +102,7 @@ export default function IntervalGroupingMultiVisualization() {
           <Input
             id="data"
             value={data}
-            onChange={(e) => setData(e.target.value)}
+            onChange={(e) => dispatch({ type: 'SET_INTERVAL_GROUPING', payload: { data: e.target.value } })}
             placeholder="1,2,3,4,5,6,7,8,9,10"
           />
         </div>
@@ -111,7 +111,7 @@ export default function IntervalGroupingMultiVisualization() {
           <Input
             id="interval"
             value={interval}
-            onChange={(e) => setInterval(e.target.value)}
+            onChange={(e) => dispatch({ type: 'SET_INTERVAL_GROUPING', payload: { interval: e.target.value } })}
             placeholder="3"
           />
         </div>

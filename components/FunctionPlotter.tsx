@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useGlobalState } from "@/app/state/globalState"
 
 const predefinedFunctions = [
   { name: 'Sin', func: 'Math.sin(x)' },
@@ -15,16 +16,13 @@ const predefinedFunctions = [
   { name: 'Tan', func: 'Math.tan(x)' },
   { name: 'x^2', func: 'Math.pow(x, 2)' },
   { name: 'x^3', func: 'Math.pow(x, 3)' },
-  { name: 'x^4', func: 'Math.pow(x, 4)' },
   { name: 'Sqrt', func: 'Math.sqrt(x)' },
   { name: 'Log', func: 'Math.log(x)' },
-  { name: 'Exp', func: 'Math.exp(x)' },
-  { name: 'Abs', func: 'Math.abs(x)' },
-  { name: 'Round', func: 'Math.round(x)' },
-  { name: 'Ceil', func: 'Math.ceil(x)' },
-  { name: 'Floor', func: 'Math.floor(x)' },
   { name: '1/x', func: '1 / x' },
+  { name: 'complexo', func: 'Math.sqrt(1 - (x / 2) ** 2) * (x >= -1 && x <= 1 ? (1 - Math.abs(x)) : 0.5)' },
 ];
+
+
 
 const predefinedRanges = [
   { name: '[-10, 10]', range: [-10, 10] },
@@ -36,12 +34,8 @@ const predefinedRanges = [
 type ChartType = 'line' | 'bar' | 'area'
 
 export default function EnhancedFunctionPlotter() {
-
-  const [selectedFunction, setSelectedFunction] = useState(predefinedFunctions[0].func)
-  const [customFunction, setCustomFunction] = useState('')
-  const [selectedRange, setSelectedRange] = useState<number[] | 'custom'>(predefinedRanges[0].range)
-  const [customRange, setCustomRange] = useState('')
-  const [steps, setSteps] = useState(100)
+  const { state, dispatch } = useGlobalState()
+  const { selectedFunction, customFunction, selectedRange, customRange, steps } = state.functionPlotter
   const [data, setData] = useState<{ x: number; y: number }[]>([])
   const [error, setError] = useState<string | null>(null)
   const [chartType, setChartType] = useState<ChartType>('line')
@@ -56,7 +50,6 @@ export default function EnhancedFunctionPlotter() {
       for (let i = 0; i < steps; i++) {
         const x = min + i * step
         const y = func(x)
-
         if (isNaN(y) || !isFinite(y)) {
           throw new Error(`Resultado inválido para x = ${x}`)
         }
@@ -68,6 +61,27 @@ export default function EnhancedFunctionPlotter() {
       setData([])
     }
   }, [selectedFunction, customFunction, selectedRange, customRange, steps])
+
+  const handleFunctionChange = (value: string) => {
+    dispatch({ type: 'SET_FUNCTION_PLOTTER', payload: { ...state.functionPlotter, selectedFunction: value } })
+  }
+
+  const handleCustomFunctionChange = (value: string) => {
+    dispatch({ type: 'SET_FUNCTION_PLOTTER', payload: { ...state.functionPlotter, customFunction: value } })
+  }
+
+  const handleRangeChange = (value: string) => {
+    const range = value === 'custom' ? 'custom' : predefinedRanges.find(r => r.name === value)!.range
+    dispatch({ type: 'SET_FUNCTION_PLOTTER', payload: { ...state.functionPlotter, selectedRange: range } })
+  }
+
+  const handleCustomRangeChange = (value: string) => {
+    dispatch({ type: 'SET_FUNCTION_PLOTTER', payload: { ...state.functionPlotter, customRange: value } })
+  }
+
+  const handleStepsChange = (value: number) => {
+    dispatch({ type: 'SET_FUNCTION_PLOTTER', payload: { ...state.functionPlotter, steps: value } })
+  }
 
   const renderChart = () => {
     const chartProps = {
@@ -118,7 +132,7 @@ export default function EnhancedFunctionPlotter() {
     <div className="space-y-4 max-w-3xl mx-auto">
       <div>
         <Label htmlFor="function">Selecione a função</Label>
-        <Select onValueChange={setSelectedFunction} defaultValue={selectedFunction}>
+        <Select onValueChange={handleFunctionChange} defaultValue={selectedFunction}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Selecione a função" />
           </SelectTrigger>
@@ -133,12 +147,12 @@ export default function EnhancedFunctionPlotter() {
       {selectedFunction === 'custom' && (
         <div>
           <Label htmlFor="customFunction">Digite a função personalizada (em termos de x)</Label>
-          <Input id="customFunction" value={customFunction} onChange={(e) => setCustomFunction(e.target.value)} placeholder="Math.sin(x)" />
+          <Input id="customFunction" value={customFunction} onChange={(e) => handleCustomFunctionChange(e.target.value)} placeholder="Math.sin(x)" />
         </div>
       )}
       <div>
         <Label htmlFor="range">Selecione o intervalo</Label>
-        <Select onValueChange={(value) => setSelectedRange(value === 'custom' ? 'custom' : predefinedRanges.find(r => r.name === value)!.range)} defaultValue={predefinedRanges[0].name}>
+        <Select onValueChange={handleRangeChange} defaultValue={predefinedRanges[0].name} value={selectedRange === 'custom' ? 'custom' : predefinedRanges.find(r => r.range === selectedRange)?.name}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Selecione o intervalo" />
           </SelectTrigger>
@@ -153,7 +167,7 @@ export default function EnhancedFunctionPlotter() {
       {selectedRange === 'custom' && (
         <div>
           <Label htmlFor="customRange">Digite o intervalo personalizado [min, max]</Label>
-          <Input id="customRange" value={customRange} onChange={(e) => setCustomRange(e.target.value)} placeholder="[-10, 10]" />
+          <Input id="customRange" value={customRange} onChange={(e) => handleCustomRangeChange(e.target.value)} placeholder="[-10, 10]" />
         </div>
       )}
       <div>
@@ -162,7 +176,7 @@ export default function EnhancedFunctionPlotter() {
           id="steps"
           type="number"
           value={steps}
-          onChange={(e) => setSteps(Math.max(2, parseInt(e.target.value) || 2))}
+          onChange={(e) => handleStepsChange(Math.max(2, parseInt(e.target.value) || 2))}
           min="2"
           max="1000"
         />

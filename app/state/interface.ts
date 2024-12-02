@@ -38,6 +38,7 @@ export type GlobalState = {
     customFunction: string
     selectedRange: number[] | 'custom'
     customRange: string
+    steps: number
   }
   treeDataTable: TreeNode
 }

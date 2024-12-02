@@ -20,6 +20,7 @@ const initialState: GlobalState = {
     customFunction: '',
     selectedRange: [-10, 10],
     customRange: '',
+    steps: 100,
   },
   treeDataTable: { id: '0', name: 'Root', type: 'folder', children: [] },
 }
